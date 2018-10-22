@@ -25,48 +25,51 @@ public class TeleOp1 extends LinearOpMode {
     private DcMotor lifter;
 
 
-
-    public void movement(double tgtPower)
+    public int clip(int power)
     {
-        if (gamepad1.right_stick_y != 0) {
-            tgtPower = -this.gamepad1.right_stick_y;
-            left.setPower(-tgtPower);
-            right.setPower(tgtPower);
+        if(power)
+        {
+
         }
+        return;
+    }
+
+
+
+    public void movement()
+    {
+        double tgtPower = -this.gamepad1.right_stick_y;
+        left.setPower(tgtPower);
+        right.setPower(-tgtPower);
 
         if (gamepad1.right_stick_x != 0) {
             tgtPower = this.gamepad1.right_stick_x;
-            left.setPower(0.2 - tgtPower);
-            right.setPower(0.2 - tgtPower);
+            left.setPower(0.2 + tgtPower);
+            right.setPower(0.2 + tgtPower);
+            telemetry.addData("tgtPower", "amount of power", tgtPower);
         }
     }
 
 
     public void collect()
     {
+        while(gamepad1.y)
             collector.setPower(0.75);
+        while(gamepad1.x)
+            collector.setPower(-0.75);
+
+        collector.setPower(0);
     }
 
     public void lifting()
     {
-        for(int i = 0; i < 7; i++)
-        {
-            lifter.setPower(0.5);
-            try
-            {
-                Thread.sleep(1000);
-            }
-            catch(InterruptedException ex)
-            {
-                Thread.currentThread().interrupt();
-            }
-        }
+        while(gamepad1.a)
+            lifter.setPower(0.3);
+
+        while(gamepad1.b)
+            lifter.setPower(-0.3);
+
         lifter.setPower(0);
-    }
-
-    public void resetlift()
-    {
-
     }
 
     @Override
@@ -85,19 +88,13 @@ public class TeleOp1 extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-
-            double tgtPower = 0;
-
             left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             collector.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            movement(tgtPower);
+            movement();
             collect();
 
-            //if(gamepad1.x)
-            //{
-            //    lifting();
-            //}
+
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
